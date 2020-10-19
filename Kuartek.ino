@@ -1,5 +1,6 @@
 #include "motor_control.h"
 #include "gcode.h"
+#include "end_stop.h"
 
 float justOnce = true;
 String serial_data;
