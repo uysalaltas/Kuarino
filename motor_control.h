@@ -24,13 +24,14 @@
   #define Z_CS_PIN         40
 #endif
 
-class motor_control { 
+class motor_control {
+  private:
+    int motor_speed(int speed);
   public:
     motor_control();
     void init();
-    void run_motors(char motor_axis[], float mm[], bool motor_direction[]);
+    void run_motors(char motor_axis[], float mm[], bool motor_direction[], int motor_spd);
     void home_all();
-    void motor_speed(int speed);
 //    void control_x(float mm, char motor_direction = '+');
 //    void control_y(float mm, char motor_direction = '+');
 //    void motor_on(char motor_axis, float mm, char motor_direction='+');

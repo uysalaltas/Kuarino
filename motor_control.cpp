@@ -4,7 +4,6 @@
 
 const int stepsPerRevolution = 200;
 float stepPerAngle = 1.8;
-float motor_speed_val = 200;
 end_stop limit_switch;
 
 motor_control::motor_control(){
@@ -21,7 +20,7 @@ void motor_control::init(){
   pinMode(Y_DIR_PIN, OUTPUT);
 }
 
-void motor_control::run_motors(char motor_axis[], float mm[], bool motor_direction[]){
+void motor_control::run_motors(char motor_axis[], float mm[], bool motor_direction[], int motor_spd){
 
   //--- Value Initializing ---
   int index_x = 0;
@@ -94,7 +93,9 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
 
   //--- Motor movement ---
   Serial.print("Speed: ");
-  Serial.println(motor_speed_val);
+  Serial.println(motor_spd);
+
+  int motor_speed_val = motor_speed(motor_spd);
   
   for(int val = 0; val < num_step; val++)
   {
@@ -160,10 +161,11 @@ void motor_control::home_all(){
   Serial.println("-----Home All Ended-------");
 }
 
-void motor_control::motor_speed(int speed_control){
-  motor_speed_val = 1000000 / (speed_control * 8);
+int motor_control::motor_speed(int speed_control){
+  int motor_speed_val = 1000000 / (speed_control * 8);
   Serial.print("Motor Speed (mm/sn): ");
   Serial.println(motor_speed_val);
+  return motor_speed_val;
 }
 
 //void motor_control::motor_on(char motor_axis, float mm, char motor_direction = '+'){

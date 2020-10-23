@@ -55,9 +55,13 @@ void gcode::g_commands(char g_command[], char motor_speed_val[]){
           if (motor_speed_val != NULL)
           {
             int speed_of_motor = atoi(motor_speed_val);
-            motor.motor_speed(speed_of_motor);
+            motor_gcode(motor_axis, speed_of_motor);
           }
-          motor_gcode(motor_axis);
+          else
+          {
+            motor_gcode(motor_axis);
+          }
+          
           break;
         case 28:
           Serial.println("Home all");
@@ -70,11 +74,11 @@ void gcode::g_commands(char g_command[], char motor_speed_val[]){
   }
 }
 
-void gcode::motor_gcode(char motor_code[]){
+void gcode::motor_gcode(char motor_code[], int motor_spd = 500){
   Serial.println("---START---");
-  char motor_axis [3];
+  char motor_axis [3] = {' ',' ',' '};
   bool motor_axis_dir [3];
-  float motor_axis_dist [4];
+  float motor_axis_dist [4] = {};
   int index_size = 0;
 
   char * pch_motor;
@@ -121,7 +125,7 @@ void gcode::motor_gcode(char motor_code[]){
   }
   Serial.println(motor_axis);
   Serial.println("---END---");
-  motor.run_motors(motor_axis, motor_axis_dist, motor_axis_dir);
+  motor.run_motors(motor_axis, motor_axis_dist, motor_axis_dir, motor_spd);
 
   // char * pch;
   // pch = strstr (motor_code, motor_codes);
