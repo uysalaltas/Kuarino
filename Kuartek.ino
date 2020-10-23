@@ -20,7 +20,3 @@ void loop() {
     gcode_read.g_control(read_g_code);
   }
 }
-
-void test() {
-
-}

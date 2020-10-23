@@ -30,10 +30,10 @@ class motor_control {
     void init();
     void run_motors(char motor_axis[], float mm[], bool motor_direction[]);
     void home_all();
+    void motor_speed(int speed);
 //    void control_x(float mm, char motor_direction = '+');
 //    void control_y(float mm, char motor_direction = '+');
 //    void motor_on(char motor_axis, float mm, char motor_direction='+');
-//    void motor_speed(long speed);
 };
 
 #endif
