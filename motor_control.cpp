@@ -14,10 +14,31 @@ void motor_control::init(){
   pinMode(X_ENABLE_PIN, OUTPUT);
   pinMode(X_STEP_PIN, OUTPUT);
   pinMode(X_DIR_PIN, OUTPUT);
+  pinMode(X_CS_PIN, OUTPUT);
 
   pinMode(Y_ENABLE_PIN, OUTPUT);
   pinMode(Y_STEP_PIN, OUTPUT);
   pinMode(Y_DIR_PIN, OUTPUT);
+  pinMode(Y_CS_PIN, OUTPUT);
+
+  pinMode(Z_ENABLE_PIN, OUTPUT);
+  pinMode(Z_STEP_PIN, OUTPUT);
+  pinMode(Z_DIR_PIN, OUTPUT);
+  pinMode(Z_CS_PIN, OUTPUT);
+
+  pinMode(E0_ENABLE_PIN, OUTPUT);
+  pinMode(E0_STEP_PIN, OUTPUT);
+  pinMode(E0_DIR_PIN, OUTPUT);
+  pinMode(E0_CS_PIN, OUTPUT);
+
+  pinMode(E1_ENABLE_PIN, OUTPUT);
+  pinMode(E1_STEP_PIN, OUTPUT);
+  pinMode(E1_DIR_PIN, OUTPUT);
+  pinMode(E1_CS_PIN, OUTPUT);
+
+  pinMode(V1_ENABLE_PIN, OUTPUT);
+  pinMode(V1_IN_1, OUTPUT);
+  pinMode(V1_IN_2, OUTPUT);
 }
 
 void motor_control::run_motors(char motor_axis[], float mm[], bool motor_direction[], int motor_spd){
@@ -45,7 +66,10 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
       bool_z = true;
     }
   }
-  
+
+  Serial.print("Motor Axis: ");
+  Serial.println(motor_axis);
+
   float num_step = 0;
   for(int i = 0; i < 3; i++){
     if(num_step < mm[i]){
@@ -55,11 +79,9 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
   Serial.print("Distance: ");
   Serial.println(num_step);
 
-  float distance_to_degree = num_step * 0.9f;
-  num_step = distance_to_degree / stepPerAngle * 16;
+  num_step = distance_to_degree(num_step);
 
-  float distance_to_degree_x = mm[index_x] * 0.9f;
-  int num_step_x = distance_to_degree_x / stepPerAngle * 16;
+  int num_step_x = distance_to_degree(mm[index_x]);
   bool dir_x = motor_direction[index_x];
   Serial.print("DirX: ");
   Serial.println(dir_x);
@@ -70,8 +92,7 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
     digitalWrite(X_DIR_PIN, HIGH);
   }
 
-  float distance_to_degree_y = mm[index_y] * 0.9f;
-  int num_step_y = distance_to_degree_y / stepPerAngle * 16;
+  int num_step_y = distance_to_degree(mm[index_y]);
   bool dir_y = motor_direction[index_y];
   Serial.print("DirY: ");
   Serial.println(dir_y);
@@ -82,8 +103,7 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
     digitalWrite(Y_DIR_PIN, HIGH);
   }
   
-  float distance_to_degree_z = mm[index_z] * 0.9f;
-  int num_step_z = distance_to_degree_z / stepPerAngle * 16;
+  int num_step_z = distance_to_degree(mm[index_z]);
   bool dir_z = motor_direction[index_z];
   if(dir_z == false){
     digitalWrite(Z_DIR_PIN, LOW);
@@ -92,6 +112,10 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
   }
 
   //--- Motor movement ---
+  digitalWrite(X_ENABLE_PIN, LOW);
+  digitalWrite(Y_ENABLE_PIN, LOW);
+  // digitalWrite(E1_ENABLE_PIN, LOW);
+
   Serial.print("Speed: ");
   Serial.println(motor_spd);
 
@@ -132,6 +156,10 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
 
 void motor_control::home_all(){
   Serial.println("Home All Started");
+  digitalWrite(X_ENABLE_PIN, LOW);
+  digitalWrite(Y_ENABLE_PIN, LOW);
+  digitalWrite(E1_ENABLE_PIN, LOW);
+
   digitalWrite(X_DIR_PIN, LOW);
   for(;;){
     int stop_val_x = limit_switch.stop_x();
@@ -158,7 +186,81 @@ void motor_control::home_all(){
     delayMicroseconds(100);
   }
 
-  Serial.println("-----Home All Ended-------");
+  digitalWrite(E1_DIR_PIN, LOW);
+  for(;;){
+    int stop_val_z = limit_switch.stop_z();
+    if(stop_val_z == 0){
+      Serial.println("Loop Break.");
+      break;
+    }
+    digitalWrite(E1_STEP_PIN, HIGH);
+    delayMicroseconds(200);
+    digitalWrite(E1_STEP_PIN, LOW);
+    delayMicroseconds(200);
+  }
+
+  char home_motor_codes[3] = {'X', 'Y'};
+  float home_motor_mm[3] = {100, 100};
+  bool home_motor_dir[2] = {true, true};
+  int home_motor_spd = 1000;
+
+  run_motors(home_motor_codes, home_motor_mm, home_motor_dir, home_motor_spd);
+
+  Serial.println("---END---");
+}
+
+void motor_control::extruder_motor(float mm[]){
+  Serial.println("Extruder is moving!");
+  Serial.println(mm[0]);
+  int ext_dist = distance_to_degree(mm[0]);
+  int motor_speed_ext = 50;
+  digitalWrite(E1_DIR_PIN, HIGH);
+  
+  for (int val = 0; val < ext_dist; val++)
+  {
+    digitalWrite(E1_STEP_PIN, HIGH);
+    delayMicroseconds(motor_speed_ext);
+    digitalWrite(E1_STEP_PIN, LOW);
+    delayMicroseconds(motor_speed_ext);
+  }
+
+  delay(500);
+  digitalWrite(E1_DIR_PIN, LOW);
+  
+  for (int val = 0; val < ext_dist; val++)
+  {
+    digitalWrite(E1_STEP_PIN, HIGH);
+    delayMicroseconds(motor_speed_ext);
+    digitalWrite(E1_STEP_PIN, LOW);
+    delayMicroseconds(motor_speed_ext);
+  }
+  Serial.println("Extruder is done!");
+  Serial.println("---END---");
+}
+
+void motor_control::disable_all_motors(){
+  Serial.println("All motors disabling...");
+  digitalWrite(X_ENABLE_PIN, HIGH);
+  digitalWrite(Y_ENABLE_PIN, HIGH);
+  digitalWrite(E1_ENABLE_PIN, HIGH);
+  Serial.println("All motors disabled!");
+  Serial.println("---END---");
+}
+
+void motor_control::run_vacuum(){
+  Serial.println("Vacuum Started...");
+  bool control_vacuum = true;
+  int counter = 0;
+
+  analogWrite(V1_ENABLE_PIN, 255);
+  digitalWrite(V1_IN_1, HIGH);
+  digitalWrite(V1_IN_2, LOW);
+}
+
+void motor_control::stop_vacuum(){
+  digitalWrite(V1_IN_1, LOW);
+  digitalWrite(V1_IN_2, LOW);
+  Serial.println("Vacuum Ended");
 }
 
 int motor_control::motor_speed(int speed_control){
@@ -168,80 +270,8 @@ int motor_control::motor_speed(int speed_control){
   return motor_speed_val;
 }
 
-//void motor_control::motor_on(char motor_axis, float mm, char motor_direction = '+'){
-//  Serial.println(motor_axis);
-//  Serial.println(mm);
-//  Serial.println(motor_direction);
-//
-//  if(motor_axis == 'X'){
-//    if(motor_direction == '-'){
-//      digitalWrite(X_DIR_PIN, LOW);
-//    } else {
-//      digitalWrite(X_DIR_PIN, HIGH);
-//    }
-//    float distance_to_degree_x = mm * 0.9f;
-//    int numStep_x = distance_to_degree_x / stepPerAngle * 16;
-//    
-//    for(int x = 0; x < numStep_x; x++)
-//    {
-//      digitalWrite(X_STEP_PIN, HIGH);
-//      delayMicroseconds(100);
-//      digitalWrite(X_STEP_PIN, LOW);
-//      delayMicroseconds(100);
-//    }
-//    Serial.println("X motor endend");
-//  }
-//  else if (motor_axis == 'Y'){
-//    if(motor_direction == '-'){
-//      digitalWrite(Y_DIR_PIN, LOW);
-//    } else {
-//      digitalWrite(Y_DIR_PIN, HIGH);
-//    }
-//    float distance_to_degree_y = mm * 0.9f;
-//    int numStep_y = distance_to_degree_y / stepPerAngle * 16;
-//    for(int x = 0; x < numStep_y; x++)
-//    {
-//      digitalWrite(Y_STEP_PIN, HIGH);
-//      delayMicroseconds(100);
-//      digitalWrite(Y_STEP_PIN, LOW);
-//      delayMicroseconds(100);
-//    }
-//    Serial.println("Y motor ended");
-//  }
-//}
-
-//void motor_control::control_x(float mm, char motor_direction = '+'){
-//  if(motor_direction == '-'){
-//    digitalWrite(X_DIR_PIN, LOW);
-//  } else {
-//    digitalWrite(X_DIR_PIN, HIGH);
-//  }
-//  float distance_to_degree_x = mm * 0.9f;
-//  int numStep_x = distance_to_degree_x / stepPerAngle * 16; 
-//  for(int x = 0; x < numStep_x; x++)
-//  {
-//    digitalWrite(X_STEP_PIN, HIGH);
-//    delayMicroseconds(100);
-//    digitalWrite(X_STEP_PIN, LOW);
-//    delayMicroseconds(100);
-//  }
-//  Serial.println("X motor endend");
-//}
-//
-//void motor_control::control_y(float mm, char motor_direction = '+'){
-//  if(motor_direction == '-'){
-//    digitalWrite(Y_DIR_PIN, LOW);
-//  } else {
-//    digitalWrite(Y_DIR_PIN, HIGH);
-//  }
-//  float distance_to_degree_y = mm * 0.9f;
-//  int numStep_y = distance_to_degree_y / stepPerAngle * 16; 
-//  for(int x = 0; x < numStep_y; x++)
-//  {
-//    digitalWrite(Y_STEP_PIN, HIGH);
-//    delayMicroseconds(100);
-//    digitalWrite(Y_STEP_PIN, LOW);
-//    delayMicroseconds(100);
-//  }
-//  Serial.println("Y motor endend");
-//}
+int motor_control::distance_to_degree(float mm_dist){
+  float distance_to_degree = mm_dist * 0.9f;
+  int degree_result = distance_to_degree / 1.8f * 16;
+  return degree_result;
+}

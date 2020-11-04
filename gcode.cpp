@@ -24,7 +24,6 @@ void gcode::g_control(char g_array[]){
   g_code = codes[0];
   motor_axis = codes[1];
   motor_speed = codes[2];
-
   g_commands(g_code, motor_speed);
  
 }
@@ -61,15 +60,26 @@ void gcode::g_commands(char g_command[], char motor_speed_val[]){
           {
             motor_gcode(motor_axis);
           }
-          
           break;
         case 28:
           Serial.println("Home all");
           motor.home_all();
+          break;
       }
       break;
     case 'M':
       Serial.println("Its M");
+      switch (command_code){
+        case 18:
+          motor.disable_all_motors();
+          break;
+        case 20:
+          motor.run_vacuum();
+          break;
+        case 25:
+          motor.stop_vacuum();
+          break;
+      }
       break;
   }
 }
@@ -124,47 +134,14 @@ void gcode::motor_gcode(char motor_code[], int motor_spd = 500){
     
   }
   Serial.println(motor_axis);
+  
+  if (motor_axis[0] == 'Z')
+  {
+    motor.extruder_motor(motor_axis_dist);
+  }
+  else
+  {
+    motor.run_motors(motor_axis, motor_axis_dist, motor_axis_dir, motor_spd);
+  }
   Serial.println("---END---");
-  motor.run_motors(motor_axis, motor_axis_dist, motor_axis_dir, motor_spd);
-
-  // char * pch;
-  // pch = strstr (motor_code, motor_codes);
-  
-  // char motor_axis [3];
-  // bool motor_axis_dir [3];
-  // float motor_axis_dist [3];
-  // int index_size = 0;
-  
-  // while (pch != NULL)
-  // {
-  //   int index = pch-motor_code + 1;
-  //   int index_int = 0;
-        
-  //   motor_axis[index_size] = *pch;
-    
-  //   bool dir = true;
-  //   if(motor_code[index] == '-'){
-  //     dir = false;
-  //     index += 1;
-  //   }
-  //   motor_axis_dir[index_size] = dir;
-    
-  //   char * pch_num;
-  //   pch_num = strchr(numbers, motor_code[index]);
-
-  //   char motor_distance [4] = "   ";
-  //   while(pch_num != NULL)
-  //   {
-  //     motor_distance[index_int] = *pch_num;
-      
-  //     index += 1;
-  //     index_int += 1;
-  //     pch_num = strchr(numbers, motor_code[index]);
-  //   }
-    
-  //   int distance = atoi(motor_distance);
-  //   motor_axis_dist[index_size] = distance;
-  //   index_size += 1;
-  //   pch = strpbrk (pch+1,motor_codes);
-  // }
 }
