@@ -6,7 +6,7 @@
 class gcode {
   private:
     void split_gcode(char g_array[]);
-    void motor_gcode(char motor_code[], int motor_spd = 500);
+    void motor_gcode(char motor_code[], int motor_spd);
     void g_commands(char g_command [], char motor_speed_val[]);
   public:
     gcode();

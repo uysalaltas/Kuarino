@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"iterator": "cpp",
+			"*.tcc": "cpp"
+		},
+		"editor.tabSize": 2
+	}
+}

@@ -1,13 +1,13 @@
 #include "end_stop.h"
 #include "Arduino.h"
+#include "pins.h"
 
 end_stop::end_stop(){
   init();
 }
 
 void end_stop::init(){
-  pinMode(X_MIN_PIN, INPUT_PULLUP);
-  pinMode(X_MAX_PIN, INPUT_PULLUP);
+
 }
 
 int end_stop::stop_x(){

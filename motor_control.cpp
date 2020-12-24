@@ -1,7 +1,11 @@
 #include "motor_control.h"
 #include "end_stop.h"
 #include "Arduino.h"
+#include "pins.h"
+#include "utils.h"
 
+
+utils tools1;
 const int stepsPerRevolution = 200;
 float stepPerAngle = 1.8;
 end_stop limit_switch;
@@ -11,34 +15,7 @@ motor_control::motor_control(){
 }
 
 void motor_control::init(){
-  pinMode(X_ENABLE_PIN, OUTPUT);
-  pinMode(X_STEP_PIN, OUTPUT);
-  pinMode(X_DIR_PIN, OUTPUT);
-  pinMode(X_CS_PIN, OUTPUT);
 
-  pinMode(Y_ENABLE_PIN, OUTPUT);
-  pinMode(Y_STEP_PIN, OUTPUT);
-  pinMode(Y_DIR_PIN, OUTPUT);
-  pinMode(Y_CS_PIN, OUTPUT);
-
-  pinMode(Z_ENABLE_PIN, OUTPUT);
-  pinMode(Z_STEP_PIN, OUTPUT);
-  pinMode(Z_DIR_PIN, OUTPUT);
-  pinMode(Z_CS_PIN, OUTPUT);
-
-  pinMode(E0_ENABLE_PIN, OUTPUT);
-  pinMode(E0_STEP_PIN, OUTPUT);
-  pinMode(E0_DIR_PIN, OUTPUT);
-  pinMode(E0_CS_PIN, OUTPUT);
-
-  pinMode(E1_ENABLE_PIN, OUTPUT);
-  pinMode(E1_STEP_PIN, OUTPUT);
-  pinMode(E1_DIR_PIN, OUTPUT);
-  pinMode(E1_CS_PIN, OUTPUT);
-
-  pinMode(V1_ENABLE_PIN, OUTPUT);
-  pinMode(V1_IN_1, OUTPUT);
-  pinMode(V1_IN_2, OUTPUT);
 }
 
 void motor_control::run_motors(char motor_axis[], float mm[], bool motor_direction[], int motor_spd){
@@ -79,9 +56,9 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
   Serial.print("Distance: ");
   Serial.println(num_step);
 
-  num_step = distance_to_degree(num_step);
+  num_step = tools1.distance_to_degree(num_step);
 
-  int num_step_x = distance_to_degree(mm[index_x]);
+  int num_step_x = tools1.distance_to_degree(mm[index_x]);
   bool dir_x = motor_direction[index_x];
   Serial.print("DirX: ");
   Serial.println(dir_x);
@@ -92,7 +69,7 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
     digitalWrite(X_DIR_PIN, HIGH);
   }
 
-  int num_step_y = distance_to_degree(mm[index_y]);
+  int num_step_y = tools1.distance_to_degree(mm[index_y]);
   bool dir_y = motor_direction[index_y];
   Serial.print("DirY: ");
   Serial.println(dir_y);
@@ -103,7 +80,7 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
     digitalWrite(Y_DIR_PIN, HIGH);
   }
   
-  int num_step_z = distance_to_degree(mm[index_z]);
+  int num_step_z = tools1.distance_to_degree(mm[index_z]);
   bool dir_z = motor_direction[index_z];
   if(dir_z == false){
     digitalWrite(Z_DIR_PIN, LOW);
@@ -114,12 +91,12 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
   //--- Motor movement ---
   digitalWrite(X_ENABLE_PIN, LOW);
   digitalWrite(Y_ENABLE_PIN, LOW);
-  // digitalWrite(E1_ENABLE_PIN, LOW);
+  // digitalWrite(Z_ENABLE_PIN, LOW);
 
   Serial.print("Speed: ");
   Serial.println(motor_spd);
 
-  int motor_speed_val = motor_speed(motor_spd);
+  int motor_speed_val = tools1.motor_speed(motor_spd);
   
   for(int val = 0; val < num_step; val++)
   {
@@ -186,7 +163,7 @@ void motor_control::home_all(){
     delayMicroseconds(100);
   }
 
-  digitalWrite(E1_DIR_PIN, LOW);
+  digitalWrite(E1_DIR_PIN, HIGH);
   for(;;){
     int stop_val_z = limit_switch.stop_z();
     if(stop_val_z == 0){
@@ -209,35 +186,6 @@ void motor_control::home_all(){
   Serial.println("---END---");
 }
 
-void motor_control::extruder_motor(float mm[]){
-  Serial.println("Extruder is moving!");
-  Serial.println(mm[0]);
-  int ext_dist = distance_to_degree(mm[0]);
-  int motor_speed_ext = 50;
-  digitalWrite(E1_DIR_PIN, HIGH);
-  
-  for (int val = 0; val < ext_dist; val++)
-  {
-    digitalWrite(E1_STEP_PIN, HIGH);
-    delayMicroseconds(motor_speed_ext);
-    digitalWrite(E1_STEP_PIN, LOW);
-    delayMicroseconds(motor_speed_ext);
-  }
-
-  delay(500);
-  digitalWrite(E1_DIR_PIN, LOW);
-  
-  for (int val = 0; val < ext_dist; val++)
-  {
-    digitalWrite(E1_STEP_PIN, HIGH);
-    delayMicroseconds(motor_speed_ext);
-    digitalWrite(E1_STEP_PIN, LOW);
-    delayMicroseconds(motor_speed_ext);
-  }
-  Serial.println("Extruder is done!");
-  Serial.println("---END---");
-}
-
 void motor_control::disable_all_motors(){
   Serial.println("All motors disabling...");
   digitalWrite(X_ENABLE_PIN, HIGH);
@@ -245,33 +193,4 @@ void motor_control::disable_all_motors(){
   digitalWrite(E1_ENABLE_PIN, HIGH);
   Serial.println("All motors disabled!");
   Serial.println("---END---");
-}
-
-void motor_control::run_vacuum(){
-  Serial.println("Vacuum Started...");
-  bool control_vacuum = true;
-  int counter = 0;
-
-  analogWrite(V1_ENABLE_PIN, 255);
-  digitalWrite(V1_IN_1, HIGH);
-  digitalWrite(V1_IN_2, LOW);
-}
-
-void motor_control::stop_vacuum(){
-  digitalWrite(V1_IN_1, LOW);
-  digitalWrite(V1_IN_2, LOW);
-  Serial.println("Vacuum Ended");
-}
-
-int motor_control::motor_speed(int speed_control){
-  int motor_speed_val = 1000000 / (speed_control * 8);
-  Serial.print("Motor Speed (mm/sn): ");
-  Serial.println(motor_speed_val);
-  return motor_speed_val;
-}
-
-int motor_control::distance_to_degree(float mm_dist){
-  float distance_to_degree = mm_dist * 0.9f;
-  int degree_result = distance_to_degree / 1.8f * 16;
-  return degree_result;
 }

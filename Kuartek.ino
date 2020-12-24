@@ -1,12 +1,14 @@
 #include "motor_control.h"
 #include "gcode.h"
 #include "end_stop.h"
+#include "pins.h"
 
 float justOnce = true;
 String serial_data;
 int loopX = 1;
 
 gcode gcode_read;
+pins pin_init;
 
 void setup() {
   Serial.begin(115200);
