@@ -106,6 +106,31 @@ void gcode::g_commands(char g_command[], char motor_speed_val[]){
           delay(100);
           ext.extruder_out(extruder_distance, extruder_motor_speed);
           break;
+        case 5:
+          extruder_motor_speed = 2000;
+          extruder_distance = 350;
+
+          if (motor_speed_val != NULL)
+          {
+            extruder_motor_speed = atoi(motor_speed_val);
+            extruder_distance = atoi(motor_axis);
+          }
+          ext.extruder_in(extruder_distance, extruder_motor_speed);
+          Serial.println("---END---");
+          break;
+        
+        case 6:
+          extruder_motor_speed = 2000;
+          extruder_distance = 350;
+
+          if (motor_speed_val != NULL)
+          {
+            extruder_motor_speed = atoi(motor_speed_val);
+            extruder_distance = atoi(motor_axis);
+          }
+          ext.extruder_out(extruder_distance, extruder_motor_speed);
+          break;
+
         case 18:
           motor.disable_all_motors();
           break;
