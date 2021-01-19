@@ -40,4 +40,9 @@ void pins::init(){
   
   pinMode(X_MIN_PIN, INPUT_PULLUP);
   pinMode(X_MAX_PIN, INPUT_PULLUP);
+
+  // Turned Of Motors
+  digitalWrite(X_ENABLE_PIN, HIGH);
+  digitalWrite(Y_ENABLE_PIN, HIGH);
+  digitalWrite(E1_ENABLE_PIN, HIGH);
 }

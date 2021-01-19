@@ -7,7 +7,8 @@
 	"settings": {
 		"files.associations": {
 			"iterator": "cpp",
-			"*.tcc": "cpp"
+			"*.tcc": "cpp",
+			"random": "cpp"
 		},
 		"editor.tabSize": 2
 	}

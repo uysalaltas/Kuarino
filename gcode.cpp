@@ -88,7 +88,7 @@ void gcode::g_commands(char g_command[], char motor_speed_val[]){
           }
           ext.selenoid_off();
           ext.extruder_in(extruder_distance, extruder_motor_speed);
-          delay(50);
+          delay(1000);
           ext.extruder_out(extruder_distance, extruder_motor_speed);
           break;
         case 4:
