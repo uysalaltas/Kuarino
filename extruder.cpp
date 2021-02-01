@@ -15,7 +15,6 @@ void exturder::init(){
 }
 
 void exturder::extruder_in(int mm, int motor_speed_val){
-  Serial.println("Extruder is moving down!");
   digitalWrite(E1_ENABLE_PIN, LOW);
 
   int ext_dist = tools2.distance_to_degree(mm);
@@ -32,8 +31,6 @@ void exturder::extruder_in(int mm, int motor_speed_val){
 }
 
 void exturder::extruder_out(int mm, int motor_speed_val){
-  Serial.println("Extruder is moving up!");
-
   int motor_speed_ext = tools2.motor_speed(motor_speed_val);
   int ext_dist = tools2.distance_to_degree(mm);
   digitalWrite(E1_DIR_PIN, HIGH);
@@ -45,7 +42,6 @@ void exturder::extruder_out(int mm, int motor_speed_val){
     digitalWrite(E1_STEP_PIN, LOW);
     delayMicroseconds(motor_speed_ext);
   }
-  Serial.println("Extruder is done!");
   Serial.println("---END---");
 }
 
@@ -53,7 +49,6 @@ void exturder::vacuum_control(){
   
   if (vacuumValve == false)
   {
-    Serial.println("Vacuum Started...");
     analogWrite(V1_ENABLE_PIN, 255);
     digitalWrite(V1_IN_1, HIGH);
     digitalWrite(V1_IN_2, LOW);
@@ -64,7 +59,6 @@ void exturder::vacuum_control(){
     digitalWrite(V1_IN_1, LOW);
     digitalWrite(V1_IN_2, LOW);
     vacuumValve = false;
-    Serial.println("Vacuum Ended");
   }
   Serial.println("---END---");
   

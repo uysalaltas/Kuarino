@@ -60,9 +60,6 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
 
   int num_step_x = tools1.distance_to_degree(mm[index_x]);
   bool dir_x = motor_direction[index_x];
-  Serial.print("DirX: ");
-  Serial.println(dir_x);
-
   if(dir_x == false){
     digitalWrite(X_DIR_PIN, LOW);
   } else {
@@ -71,9 +68,6 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
 
   int num_step_y = tools1.distance_to_degree(mm[index_y]);
   bool dir_y = motor_direction[index_y];
-  Serial.print("DirY: ");
-  Serial.println(dir_y);
-
   if(dir_y == false){
     digitalWrite(Y_DIR_PIN, LOW);
   } else {
@@ -132,7 +126,6 @@ void motor_control::run_motors(char motor_axis[], float mm[], bool motor_directi
 }
 
 void motor_control::home_all(){
-  Serial.println("Home All Started");
   digitalWrite(X_ENABLE_PIN, LOW);
   digitalWrite(Y_ENABLE_PIN, LOW);
   digitalWrite(E1_ENABLE_PIN, LOW);
@@ -141,7 +134,6 @@ void motor_control::home_all(){
   for(;;){
     int stop_val_x = limit_switch.stop_x();
     if(stop_val_x == 0){
-      Serial.println("Loop Break.");
       break;
     }
     digitalWrite(X_STEP_PIN, HIGH);
@@ -154,7 +146,6 @@ void motor_control::home_all(){
   for(;;){
     int stop_val_y = limit_switch.stop_y();
     if(stop_val_y == 0){
-      Serial.println("Loop Break.");
       break;
     }
     digitalWrite(Y_STEP_PIN, HIGH);
@@ -167,7 +158,6 @@ void motor_control::home_all(){
   for(;;){
     int stop_val_z = limit_switch.stop_z();
     if(stop_val_z == 0){
-      Serial.println("Loop Break.");
       break;
     }
     digitalWrite(E1_STEP_PIN, HIGH);
@@ -187,10 +177,8 @@ void motor_control::home_all(){
 }
 
 void motor_control::disable_all_motors(){
-  Serial.println("All motors disabling...");
   digitalWrite(X_ENABLE_PIN, HIGH);
   digitalWrite(Y_ENABLE_PIN, HIGH);
   digitalWrite(E1_ENABLE_PIN, HIGH);
-  Serial.println("All motors disabled!");
   Serial.println("---END---");
 }

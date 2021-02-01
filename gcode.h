@@ -1,15 +1,13 @@
-#include "Arduino.h"
-
 #ifndef gcode_h
 #define gcode_h
 
 class gcode {
   private:
-    void split_gcode(char g_array[]);
     void motor_gcode(char motor_code[], int motor_spd);
-    void g_commands(char g_command [], char motor_speed_val[]);
+    void g_commands();
   public:
     gcode();
+    // void split_gcode(char command[], char axes_dir[], char axes_speed[], char g_array[]);
     void g_control(char g_array[]);
 };
 

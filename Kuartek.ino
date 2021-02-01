@@ -9,7 +9,7 @@ String serial_data;
 gcode gcode_read;
 pins pin_init;
 
-#define MSG_MAX_LEN 21
+#define MSG_MAX_LEN 22
 
 volatile uint8_t m_newMessage;
 volatile uint8_t m_packetBuffer[MSG_MAX_LEN];
@@ -64,46 +64,24 @@ void serialEvent()
   while(Serial.available())
   {
     volatile char ch = Serial.read();
-    // Serial.write(ch);
-
-    if (m_packetBufferInd+1 > MSG_MAX_LEN)
-    {
-      Serial.println("Package is higher than expected!");
-      m_packetBufferInd = 0;
-      m_newMessage = false;
-    }
-    else
-    {
-      m_msgTimeoutCnt_ms = 200;
-    }
 
     if (m_newMessage == true)
     {
       m_packetBuffer[m_packetBufferInd] = ch;
       m_packetBufferInd = m_packetBufferInd + 1;
 
-      for (int i = 0; i < MSG_MAX_LEN; i++)
+      if (m_packetBuffer[0] > MSG_MAX_LEN)
       {
-        Serial.println(m_packetBuffer[i]);
+        Serial.println("Package is higher than expected!");
+        m_packetBufferInd = 0;
+        m_newMessage = false;
       }
-
-      if (ch == 10)
+      else if (ch == 10 && m_packetBufferInd != 1)
       {
         gcode_read.g_control(m_packetBuffer);
       }
+      m_msgTimeoutCnt_ms = 200;
     }
-    
-    // serial_data = Serial.readString();
-    // char read_g_code [serial_data.length()];
-    // serial_data.toCharArray(read_g_code, serial_data.length());
-
-    // for (int i = 0; i < serial_data.length(); i++)
-    // {
-    //   Serial.println(read_g_code[i]);
-    // }
-    // Serial.println("G-Code: ");
-    // Serial.println(read_g_code);
-    // gcode_read.g_control(read_g_code);
   }
 }
 
