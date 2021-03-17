@@ -8,6 +8,7 @@ class motor_control {
     motor_control();
     void init();
     void run_motors(char motor_axis[], float mm[], bool motor_direction[], int motor_spd);
+    void cartridge_motor(int mm, int motor_spd);
     void home_all();
     void disable_all_motors();
 };

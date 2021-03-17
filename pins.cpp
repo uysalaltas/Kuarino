@@ -44,5 +44,7 @@ void pins::init(){
   // Turned Of Motors
   digitalWrite(X_ENABLE_PIN, HIGH);
   digitalWrite(Y_ENABLE_PIN, HIGH);
+  digitalWrite(Z_ENABLE_PIN, HIGH);
+  digitalWrite(E0_ENABLE_PIN, HIGH);
   digitalWrite(E1_ENABLE_PIN, HIGH);
 }

@@ -3,6 +3,7 @@
 #include "extruder.h"
 #include "string.h"
 #include "utils.h"
+#include "pins.h"
 // #include "utils.cpp"
 
 motor_control motor;
@@ -19,6 +20,8 @@ char motor_axis [AXIS_MAX_LEN];
 char motor_speed [SPEED_MAX_LEN];
 // char distance_mm;
 // char motor_dir;
+
+char motor_codes[3] = {'X', 'Y', 'Z'};
 
 bool selanoidValve = false;
 int extruder_distance;
@@ -48,7 +51,6 @@ void gcode::g_commands(){
           }
           else
           {
-            Serial.println("Null Here");
             motor_gcode(motor_axis, 500);
           }
           break;
@@ -59,6 +61,10 @@ void gcode::g_commands(){
       break;
     case 'M':
       switch (command_code){
+        case 1:
+          motor.cartridge_motor(200, 200);
+          Serial.println("---END---");
+          break;
         case 3:
           extruder_motor_speed = 2000;
           extruder_distance = 350;
@@ -67,7 +73,7 @@ void gcode::g_commands(){
             extruder_motor_speed = atoi(motor_speed);
             extruder_distance = atoi(motor_axis);
           }
-          ext.selenoid_off();
+          digitalWrite(SELENOID, LOW);
           ext.extruder_in(extruder_distance, extruder_motor_speed);
           delay(1000);
           ext.extruder_out(extruder_distance, extruder_motor_speed);
@@ -82,7 +88,7 @@ void gcode::g_commands(){
           }
           ext.extruder_in(extruder_distance, extruder_motor_speed);
           delay(100);
-          ext.selenoid_on();
+          digitalWrite(SELENOID, HIGH);
           delay(100);
           ext.extruder_out(extruder_distance, extruder_motor_speed);
           break;
@@ -138,7 +144,6 @@ void gcode::motor_gcode(char motor_code[], int motor_spd){
   int index_size = 0;
   char * pch_motor;
   for(char x:motor_codes){
-    Serial.println(x);
     pch_motor = strchr (motor_code, x);
     if (pch_motor != NULL) 
     {
@@ -166,7 +171,7 @@ void gcode::motor_gcode(char motor_code[], int motor_spd){
     } 
     else
     {
-      Serial.println("NULL");
+      Serial.println("Motor NULL");
     }
   }
   motor.run_motors(motor_axis, motor_axis_dist, motor_axis_dir, motor_spd);
