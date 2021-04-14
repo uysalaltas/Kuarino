@@ -1,4 +1,7 @@
 {
     "editor.tabSize": 2,
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "cmath": "cpp"
+    }
 }

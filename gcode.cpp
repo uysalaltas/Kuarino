@@ -62,7 +62,7 @@ void gcode::g_commands(){
     case 'M':
       switch (command_code){
         case 1:
-          motor.cartridge_motor(200, 200);
+          motor.cartridge_motor(2000, 1000);
           Serial.println("---END---");
           break;
         case 3:
