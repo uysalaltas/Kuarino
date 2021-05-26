@@ -3,9 +3,10 @@
 #include "end_stop.h"
 #include "pins.h"
 #include "TimerOne.h"
+#include <Arduino_FreeRTOS.h>
 
 String serial_data;
-
+FILE *fileI;
 gcode gcode_read;
 pins pin_init;
 
@@ -57,6 +58,8 @@ void setup() {
   Serial.begin(115200);
   timer_init();
   comHandler_init();
+  
+  fileI = fopen("1.gcode", "r");
 }
 
 void serialEvent()

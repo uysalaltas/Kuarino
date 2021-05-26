@@ -7,7 +7,7 @@
 #define DECEL_SLOPE     16
 #define HALF_POINT_C1   0.25
 #define HALF_POINT_C2   4.75
-#define ACCEL_CURVE     0.10
+#define ACCEL_CURVE     0.05
 
 
 class motor_control {
