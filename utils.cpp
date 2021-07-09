@@ -1,6 +1,9 @@
-// #include "Arduino.h"
+#include "Arduino.h"
 #include "utils.h"
 #include "string.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 
 #define GCODE_MAX_LEN 3
 #define AXIS_MAX_LEN 12
@@ -61,6 +64,7 @@ void utils::split_gcode(char command[], char axes_dir[], char axes_speed[], char
       }
       else
       {
+        Serial.println(gcode_array[i]);
         temp_arr[temp_inx] = gcode_array[i];      
         temp_inx += 1;
       }
@@ -68,7 +72,33 @@ void utils::split_gcode(char command[], char axes_dir[], char axes_speed[], char
   }  
 }
 
+char* utils::convert_integer_to_char(int N, int* digit_out){
+  int m = N;
+  int digit = 0;
+  char* arr;
+  while (m) {
+    digit++;
+    m /= 10;
+  }
+  char arr1[digit];
+  arr = (char*)malloc(digit);
+  int index = 0;
+  while (N) {
+    arr1[++index] = N % 10 + '0';
+    N /= 10;
+  }
+  int i;
+  for (i = 0; i < index; i++) {
+    arr[i] = arr1[index - i];
+  }
+  *digit_out = digit;
+  arr[i] = '\0';
+
+  return arr;
+}
+
 void utils::char_array_to_char_array(char out[], char in[], int len_arr){
+
   for (int x = 0; x < len_arr; x++)
   {
     out[x] = in[x];
@@ -94,3 +124,5 @@ int utils::distance_to_degree(float mm_dist){
   int degree_result = distance_to_degree / 1.8f * 16;
   return degree_result;
 }
+
+

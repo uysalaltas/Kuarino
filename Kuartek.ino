@@ -4,11 +4,13 @@
 #include "pins.h"
 #include "TimerOne.h"
 #include <Arduino_FreeRTOS.h>
+#include "Graphic12864.h"
+#include <Arduino.h>
 
 String serial_data;
-FILE *fileI;
 gcode gcode_read;
 pins pin_init;
+Graphic12864 G128;
 
 #define MSG_MAX_LEN 22
 
@@ -56,10 +58,11 @@ void comHandler_reset()
 
 void setup() {
   Serial.begin(115200);
+
   timer_init();
   comHandler_init();
-  
-  fileI = fopen("1.gcode", "r");
+  G128.Initialize();
+  // LCDA.Initialize();
 }
 
 void serialEvent()
@@ -67,7 +70,6 @@ void serialEvent()
   while(Serial.available())
   {
     volatile char ch = Serial.read();
-
     if (m_newMessage == true)
     {
       m_packetBuffer[m_packetBufferInd] = ch;
@@ -89,5 +91,10 @@ void serialEvent()
 }
 
 void loop() {
-
+  G128.draw();
+  // u8g2.clearBuffer();					// clear the internal memory
+  // u8g2.setFont(u8g2_font_ncenB08_tr);	// choose a suitable font
+  // u8g2.drawStr(0,10,"Hello F*CKING World!");	// write something to the internal memory
+  // u8g2.sendBuffer();					// transfer internal memory to the display
+  // delay(1000); 
 }

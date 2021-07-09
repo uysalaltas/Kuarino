@@ -9,6 +9,8 @@ class gcode {
     gcode();
     // void split_gcode(char command[], char axes_dir[], char axes_speed[], char g_array[]);
     void g_control(char g_array[]);
+    void g_control(char g_code_array[], char motor_axis_array[], char motor_speed_array[]);
+    void g_control(char g_code_array[], int dist);
 };
 
 #endif

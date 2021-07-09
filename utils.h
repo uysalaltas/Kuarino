@@ -11,6 +11,7 @@ class utils{
         void initialize_char_array(int max_len, char char_arr[]);
         int motor_speed(int speed);
         int distance_to_degree(float mm_dist);
+        char* convert_integer_to_char(int N, int* digit);
 };
 
 #endif

@@ -32,18 +32,69 @@ gcode::gcode(){
 }
 
 void gcode::g_control(char g_array[]){
+  Serial.println(g_array);
   tools_gcode.split_gcode(g_code, motor_axis, motor_speed, g_array);
+  g_commands();
+}
+
+void gcode::g_control(char g_code_array[], char motor_axis_array[], char motor_speed_array[]){  
+  tools_gcode.char_array_to_char_array(g_code, g_code_array, GCODE_MAX_LEN);
+  tools_gcode.char_array_to_char_array(motor_axis, motor_axis_array, AXIS_MAX_LEN);
+  tools_gcode.char_array_to_char_array(motor_speed, motor_speed_array, SPEED_MAX_LEN);
+  g_commands();
+}
+
+void gcode::g_control(char g_code_array[],int dist){
+  int dist_digit = 0;
+  int m = dist;
+  while (m) {
+    dist_digit++;
+    m /= 10;
+  }
+  char dist_char[dist_digit];
+  sprintf(dist_char, "%d", dist);
+  char motor_axis_array[22];
+
+  for (int i = 0; i < 22; i++)
+  {
+    motor_axis_array[i] = 0;
+  }
+
+  int n = 0;
+  int size_g_code_array = strlen(g_code_array);
+
+  for (int i = 0; i < size_g_code_array; i++)
+  {
+    motor_axis_array[n] = g_code_array[i];
+    if (g_code_array[i] == 'X')
+    {
+      for (size_t j = 0; j < dist_digit; j++)
+      {
+        n++;
+        motor_axis_array[n] = dist_char[j];
+      }
+    }
+    n++;
+  }
+  
+  tools_gcode.split_gcode(g_code, motor_axis, motor_speed, motor_axis_array);
   g_commands();
 }
 
 void gcode::g_commands(){
   char first_val = g_code[0];
+  Serial.print("First Val: ");
+  Serial.println(first_val);
   char * pch = strtok(g_code, "GM");
-  int command_code = atoi(pch); 
+  int command_code = atoi(pch);
+  Serial.print("Command Code: ");
+  Serial.println(first_val);
+
   switch(first_val) {
     case 'G':
       switch (command_code){
         case 1:
+          Serial.println("ITS G");
           if (motor_speed[0] != NULL)
           {
             int speed_of_motor = atoi(motor_speed);
@@ -55,6 +106,8 @@ void gcode::g_commands(){
           }
           break;
         case 28:
+          Serial.println("Home All");
+
           motor.home_all();
           break;
       }
